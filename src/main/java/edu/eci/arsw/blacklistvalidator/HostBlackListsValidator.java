@@ -39,10 +39,6 @@ public class HostBlackListsValidator {
 
         for(int i=0;i<skds.getRegisteredServersCount(); i+=rango) {
             ThreadValidator thread = new ThreadValidator(i, i + rango - 1, ipaddress);
-            System.out.print(skds.getRegisteredServersCount());
-            System.out.print("-----");
-            System.out.println(i);
-            System.out.println("-----");
             thread.start();
             thread.join();
             occurrences.addAll(thread.blackListOccurrences);
