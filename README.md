@@ -53,7 +53,7 @@ Se realizaron pruebas con diferentes configuraciones de hilos para evaluar el de
 
 ### Gráfica de Desempeño:
 
-![Gráfica de Tiempo vs Hilos](grafica_desempeño.png)<img width="4155" height="1462" alt="grafica_desempeño" src="https://github.com/user-attachments/assets/d914588b-1411-48ca-8612-80eec844ac19" />
+<img width="4155" height="1462" alt="grafica_desempeño" src="https://github.com/user-attachments/assets/d914588b-1411-48ca-8612-80eec844ac19" />
 
 
 *Análisis de la gráfica:*
@@ -73,7 +73,7 @@ La gráfica derecha (Speedup) compara el rendimiento real contra el ideal lineal
 
 *Tiempo de ejecución: 179,674 ms (~3 minutos)*
 
-![Monitor con 1 hilo](VM_1_Hilo_Monitor.png)
+<img width="1362" height="719" alt="VM_1_Hilo_Monitor" src="https://github.com/user-attachments/assets/6eca39f4-fd9c-4c0f-97e6-95e9f69b9628" />
 
 *Métricas observadas:*
 - *CPU usage:* 0.5% (uso muy bajo, solo un núcleo trabajando)
@@ -81,7 +81,7 @@ La gráfica derecha (Speedup) compara el rendimiento real contra el ideal lineal
 - *Threads:* 17 live, 19 total started
 - *Live peak:* 19 hilos
 
-![Threads con 1 hilo](VM_1_Hilo_Threads.png)
+<img width="1362" height="720" alt="VM_1_Hilo_Threads" src="https://github.com/user-attachments/assets/6e56acb3-fb8b-461b-8db4-5959946686c8" />
 
 *Observaciones:*
 - El tiempo de ejecución es el más alto (línea base)
@@ -96,7 +96,7 @@ La gráfica derecha (Speedup) compara el rendimiento real contra el ideal lineal
 *Tiempo de ejecución: 81,263 ms (~1.4 minutos)*
 *Mejora: 2.21x más rápido que 1 hilo*
 
-![Monitor con 10 hilos](VM_10_Hilos_Monitor.png)
+<img width="1365" height="698" alt="VM_10_Hilos_Monitor" src="https://github.com/user-attachments/assets/23d3618c-16dc-4deb-842e-81f5dfc38e89" />
 
 *Métricas observadas:*
 - *CPU usage:* 0.7%
@@ -104,7 +104,8 @@ La gráfica derecha (Speedup) compara el rendimiento real contra el ideal lineal
 - *Threads:* 17 live, 27 total started
 - *Live peak:* 27 hilos
 
-![Threads con 10 hilos](VM_10_Hilos_Threads.png)
+<img width="1363" height="699" alt="VM_10_Hilos_Threads" src="https://github.com/user-attachments/assets/ec74972c-fcd1-41ea-a963-ae680c633491" />
+
 
 *Observaciones:*
 - Reducción significativa del tiempo (55% más rápido)
@@ -120,7 +121,7 @@ La gráfica derecha (Speedup) compara el rendimiento real contra el ideal lineal
 *Tiempo de ejecución: 12,647 ms (~12.6 segundos)*
 *Mejora: 14.21x más rápido que 1 hilo*
 
-![Monitor con 50 hilos](VM_50_Hilos_Monitor.png)
+<img width="1364" height="694" alt="VM_50_Hilos_Monitor" src="https://github.com/user-attachments/assets/0ba9c0c8-b384-4a19-a5a8-69fce6bc87f1" />
 
 *Métricas observadas:*
 - *CPU usage:* 0.7%
@@ -128,7 +129,7 @@ La gráfica derecha (Speedup) compara el rendimiento real contra el ideal lineal
 - *Threads:* 17 live, 67 total started
 - *Live peak:* 67 hilos
 
-![Threads con 50 hilos](VM_50_Hilos_Threads.png)
+<img width="1365" height="702" alt="VM_50_Hilos_Threads" src="https://github.com/user-attachments/assets/d5e7e73c-4d77-4856-ad35-1a0585494e20" />
 
 *Observaciones:*
 - Mejora dramática en el tiempo de ejecución (93% más rápido que 1 hilo)
@@ -144,7 +145,7 @@ La gráfica derecha (Speedup) compara el rendimiento real contra el ideal lineal
 *Tiempo de ejecución: 9,594 ms (~9.6 segundos)*
 *Mejora: 18.73x más rápido que 1 hilo*
 
-![Monitor con 100 hilos](VM_100_Hilos_Monitor.png)
+<img width="1365" height="718" alt="VM_100_Hilos_Monitor" src="https://github.com/user-attachments/assets/d9884b94-7916-4e01-a95a-5ea6679afc4a" />
 
 *Métricas observadas:*
 - *CPU usage:* 0.9%
@@ -152,7 +153,8 @@ La gráfica derecha (Speedup) compara el rendimiento real contra el ideal lineal
 - *Threads:* 17 live, 117 total started
 - *Live peak:* 117 hilos
 
-![Threads con 100 hilos](VM_100_Hilos_Threads.png)
+![Uploading VM_100_Hilos_Threads.png…]()
+
 *Observaciones:*
 - La mejora respecto a 50 hilos es solo de 24% (de 12.6s a 9.6s)
 - Se alcanza el pico de 117 hilos
