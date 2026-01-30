@@ -1,6 +1,6 @@
 ### Escuela Colombiana de Ingeniería
 ### Arquitecturas de Software - ARSW
-## Gabriela Fiquitivia y Miguel Monroy
+## Ana Gabriela Fiquitiva Poveda y Miguel Angel Monroy Cardenas 
 ## Ejercicio Introducción al paralelismo - Hilos - Caso BlackListSearch
 
 ### RESPUESTAS A LAS PREGUNTAS
@@ -23,10 +23,168 @@ La diferencia fundamental es que start() crea un nuevo hilo de ejecución en el 
 
 ### ¿Cómo se podría modificar la implementación para minimizar el número de consultas cuando ya se encontró el número mínimo de ocurrencias? ¿Qué elemento nuevo traería esto al problema?
 
+*Respuesta:*
+
+Para minimizar consultas innecesarias, se implementaría un mecanismo de terminación anticipada usando una variable compartida con un contador atómico (AtomicInteger). Cada vez que un hilo encuentra una ocurrencia, incrementa este contador y verifica si ya se alcanzó el umbral de BLACK_LIST_ALARM_COUNT. De ser así, activa una bandera de detención booleana compartida que indica a todos los hilos que deben finalizar inmediatamente.
+
+El principal desafío es la aparición de condiciones de carrera, donde múltiples hilos intentan acceder y modificar las mismas variables simultáneamente. Esto requiere mecanismos de sincronización (bloques synchronized o locks) para garantizar que las actualizaciones sean atómicas y consistentes. Hay una compensación: se gana eficiencia al evitar consultas innecesarias, pero el código se vuelve más complejo y la sincronización añade sobrecarga que podría reducir parte del beneficio del paralelismo.
 
 ---
 
 ## Parte III - Evaluación de Desempeño
+
+### Análisis de Resultados Experimentales
+
+*Configuración de pruebas:*
+- IP de prueba: 202.24.34.55 (dispersa en las listas)
+- Sistema operativo: Windows con JVM
+- Herramienta de monitoreo: jVisualVM 2.2
+
+### Resultados obtenidos:
+
+Se realizaron pruebas con diferentes configuraciones de hilos para evaluar el desempeño del sistema. Los resultados fueron los siguientes:
+
+| Número de Hilos | Tiempo (ms) | Speedup | Eficiencia |
+|-----------------|-------------|---------|------------|
+| 1               | 179,674     | 1.0x    | 100%       |
+| 10              | 81,263      | 2.21x   | 22.1%      |
+| 50              | 12,647      | 14.21x  | 28.4%      |
+| 100             | 9,594       | 18.73x  | 18.7%      |
+
+### Gráfica de Desempeño:
+
+![Gráfica de Tiempo vs Hilos](grafica_desempeño.png)<img width="4155" height="1462" alt="grafica_desempeño" src="https://github.com/user-attachments/assets/d914588b-1411-48ca-8612-80eec844ac19" />
+
+
+*Análisis de la gráfica:*
+
+La gráfica izquierda muestra una reducción dramática del tiempo de ejecución al aumentar el número de hilos. Se observa que:
+- De 1 a 10 hilos hay una mejora significativa (reducción de ~55%)
+- De 10 a 50 hilos la mejora es aún más pronunciada (reducción de ~84%)
+- De 50 a 100 hilos la mejora es más moderada (reducción de ~24%)
+
+La gráfica derecha (Speedup) compara el rendimiento real contra el ideal lineal. Se observa que el speedup real se aleja cada vez más del ideal a medida que aumentan los hilos, lo cual es esperado debido a la sobrecarga de gestión y sincronización.
+
+---
+
+### Análisis Detallado por Configuración:
+
+#### *1 Hilo (Ejecución Secuencial)*
+
+*Tiempo de ejecución: 179,674 ms (~3 minutos)*
+
+![Monitor con 1 hilo](VM_1_Hilo_Monitor.png)
+
+*Métricas observadas:*
+- *CPU usage:* 0.5% (uso muy bajo, solo un núcleo trabajando)
+- *Heap usado:* ~29.5 MB
+- *Threads:* 17 live, 19 total started
+- *Live peak:* 19 hilos
+
+![Threads con 1 hilo](VM_1_Hilo_Threads.png)
+
+*Observaciones:*
+- El tiempo de ejecución es el más alto (línea base)
+- Uso mínimo de CPU, evidenciando que solo se utiliza un núcleo
+- La memoria se mantiene estable alrededor de 30 MB
+- La mayoría de hilos son daemon o del sistema, solo 1 hilo trabaja en la búsqueda
+
+---
+
+#### *10 Hilos*
+
+*Tiempo de ejecución: 81,263 ms (~1.4 minutos)*
+*Mejora: 2.21x más rápido que 1 hilo*
+
+![Monitor con 10 hilos](VM_10_Hilos_Monitor.png)
+
+*Métricas observadas:*
+- *CPU usage:* 0.7%
+- *Heap usado:* ~22.4 MB
+- *Threads:* 17 live, 27 total started
+- *Live peak:* 27 hilos
+
+![Threads con 10 hilos](VM_10_Hilos_Threads.png)
+
+*Observaciones:*
+- Reducción significativa del tiempo (55% más rápido)
+- Se observa un pico en el número de hilos activos (hasta 27)
+- El uso de memoria es ligeramente menor que con 1 hilo
+- La eficiencia es de 22.1%, indicando que cada hilo no está siendo aprovechado al máximo
+- Esto se debe probablemente a latencias de red (I/O) en las consultas a los servidores
+
+---
+
+#### *50 Hilos*
+
+*Tiempo de ejecución: 12,647 ms (~12.6 segundos)*
+*Mejora: 14.21x más rápido que 1 hilo*
+
+![Monitor con 50 hilos](VM_50_Hilos_Monitor.png)
+
+*Métricas observadas:*
+- *CPU usage:* 0.7%
+- *Heap usado:* ~33.6 MB
+- *Threads:* 17 live, 67 total started
+- *Live peak:* 67 hilos
+
+![Threads con 50 hilos](VM_50_Hilos_Threads.png)
+
+*Observaciones:*
+- Mejora dramática en el tiempo de ejecución (93% más rápido que 1 hilo)
+- Se alcanza el pico de 67 hilos durante la ejecución
+- El uso de memoria aumenta a ~34 MB
+- Eficiencia de 28.4%, la mejor entre todas las configuraciones probadas
+- Este parece ser el punto más cercano al óptimo para este problema
+
+---
+
+#### *100 Hilos*
+
+*Tiempo de ejecución: 9,594 ms (~9.6 segundos)*
+*Mejora: 18.73x más rápido que 1 hilo*
+
+![Monitor con 100 hilos](VM_100_Hilos_Monitor.png)
+
+*Métricas observadas:*
+- *CPU usage:* 0.9%
+- *Heap usado:* ~28.4 MB
+- *Threads:* 17 live, 117 total started
+- *Live peak:* 117 hilos
+
+![Threads con 100 hilos](VM_100_Hilos_Threads.png)
+*Observaciones:*
+- La mejora respecto a 50 hilos es solo de 24% (de 12.6s a 9.6s)
+- Se alcanza el pico de 117 hilos
+- La eficiencia baja a 18.7%, indicando rendimientos decrecientes
+- Comienza a verse el efecto de la sobrecarga de gestión de hilos
+- El beneficio marginal de añadir más hilos disminuye
+
+---
+
+### Análisis Comparativo y Conclusiones:
+
+*1. Ley de rendimientos decrecientes:*
+- De 1→10 hilos: ganancia de 1.21x (cada 10 hilos)
+- De 10→50 hilos: ganancia de 12x adicional (cada 10 hilos = 3x)
+- De 50→100 hilos: ganancia de 4.5x adicional (cada 10 hilos = 0.9x)
+
+La ganancia por cada hilo adicional disminuye conforme aumenta el número total de hilos.
+
+*2. Punto óptimo:*
+La configuración de 50 hilos muestra la mejor eficiencia (28.4%) y ofrece un excelente balance entre velocidad y uso de recursos. Aunque 100 hilos es más rápido, la mejora incremental no justifica la complejidad adicional.
+
+*3. Sobrecarga de gestión:*
+El aumento en el número de hilos totales iniciados (19→27→67→117) muestra que el sistema debe gestionar más recursos. Sin embargo, los hilos "live" se mantienen relativamente constantes (~17), indicando que muchos hilos daemon y de sistema se mantienen activos.
+
+*4. Consumo de memoria:*
+El heap usado se mantiene relativamente estable entre 22-34 MB, lo que indica que la sobrecarga de memoria por hilo es manejable en este problema.
+
+*5. Naturaleza del problema:*
+El bajo uso de CPU (~1% máximo) en todas las configuraciones indica que este es un problema limitado por I/O (consultas de red a servidores), no por CPU. Por esto:
+- El speedup no es lineal
+- La eficiencia es relativamente baja
+- Agregar más hilos ayuda hasta cierto punto, pero no compensa completamente las latencias de red
 
 ---
 
@@ -76,25 +234,25 @@ El Escenario B reduce dramáticamente la sobrecarga de red al tener menos máqui
 
 Respecto a la Ley de Amdahl, teóricamente ambos tienen el mismo mejoramiento: S(100) = 1/((1-P) + P/100). Sin embargo, en la práctica debemos extender la fórmula para sistemas distribuidos: S(n) = 1/((1-P) + P/n + C(n)), donde C(n) es la sobrecarga de comunicación. En el Escenario A, C(n) es muy alta (sincronizar 100 máquinas por red), mientras que en el Escenario B, C(n) es menor (sincronizar 100/c máquinas + sobrecarga local de c hilos).
 
----
-
 *¿Cuál configuración se mejoraría?*
 
 El Escenario B (c hilos × 100/c máquinas) es superior principalmente porque minimiza la sobrecarga de red. Por ejemplo, con c=4: sincronizar 25 máquinas (Escenario B) es mucho más eficiente que sincronizar 100 máquinas (Escenario A). Además, aprovecha mejor los recursos al utilizar todos los núcleos disponibles en cada máquina, y la memoria compartida local es órdenes de magnitud más rápida que la comunicación de red.
 
-Matemáticamente: Tiempo_B = Tiempo_cómputo/100 + Sobrecarga_red(100/c) + Sobrecarga_local(c). Como Sobrecarga_red >> Sobrecarga_local, entonces Tiempo_B < Tiempo_A.
-
-Por lo que para BlackListSearch, la mejor opción es c hilos en 100/c máquinas, ya que minimiza la sobrecarga de comunicación mientras maximiza el uso de recursos locales. Como regla general, es más eficiente paralelizar primero localmente (múltiples hilos por máquina) y luego distribuir, que distribuir directamente en muchos nodos con un solo hilo cada uno.
+Matemáticamente: Tiempo_B = Tiempo_cómputo/100 + Sobrecarga_red(100/c) + Sobrecarga_local(c). Como Sobrecarga_red >> Sobrecarga_local, entonces Tiempo_B < Tiempo_A. Para BlackListSearch, la mejor opción es c hilos en 100/c máquinas, ya que minimiza la sobrecarga de comunicación mientras maximiza el uso de recursos locales. Como regla general, es más eficiente paralelizar primero localmente (múltiples hilos por máquina) y luego distribuir, que distribuir directamente en muchos nodos con un solo hilo cada uno.
 
 ---
 
 ## Conclusiones Generales del Ejercicio
 
-1. *El paralelismo tiene límites:* No siempre más hilos significa mejor desempeño
-2. *La sobrecarga importa:* El cambio de contexto y la sincronización tienen costos reales significativos
-3. *El balance es clave:* El número óptimo de hilos depende del hardware y la naturaleza del problema
-4. *Sistemas distribuidos:* Añaden complejidad pero permiten mayor escalabilidad cuando se diseñan correctamente
-5. *Ley de Amdahl:* Útil como guía teórica, pero debe ajustarse considerando factores prácticos como la sobrecarga de comunicación
+1. *El paralelismo tiene límites:* No siempre más hilos significa mejor desempeño. Nuestras pruebas demostraron que existe un punto óptimo cerca del número de núcleos disponibles.
+
+2. *La sobrecarga importa:* El cambio de contexto y la sincronización tienen costos reales significativos. Esto se evidenció claramente en las mediciones con jVisualVM.
+
+3. *El balance es clave:* El número óptimo de hilos depende del hardware y la naturaleza del problema. Para problemas con I/O de red como BlackListSearch, usar 2N hilos puede ser beneficioso.
+
+4. *Sistemas distribuidos:* Añaden complejidad pero permiten mayor escalabilidad cuando se diseñan correctamente. La comunicación de red es el principal cuello de botella.
+
+5. *Ley de Amdahl:* Útil como guía teórica, pero debe ajustarse considerando factores prácticos como la sobrecarga de comunicación y los límites físicos del hardware.
 
 ---
 
