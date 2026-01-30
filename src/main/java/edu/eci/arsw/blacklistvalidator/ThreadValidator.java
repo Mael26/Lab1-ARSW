@@ -25,12 +25,12 @@ public class ThreadValidator extends Thread {
 
 
 
-    public void run(){
+    public void run() {
+        HostBlacklistsDataSourceFacade skds = HostBlacklistsDataSourceFacade.getInstance();
 
-        HostBlacklistsDataSourceFacade skds=HostBlacklistsDataSourceFacade.getInstance();
-        for(int i = a; i <= b && validator.getGlobalOccurrences() < BLACK_LIST_ALARM_COUNT; i++){
+        for (int i = a; i < b && validator.getGlobalOccurrences() < BLACK_LIST_ALARM_COUNT; i++) {
             checkedLists++;
-            if (skds.isInBlackListServer(i, ipaddress)){
+            if (skds.isInBlackListServer(i, ipaddress)) {
                 blackListOccurrences.add(i);
                 validator.addOccurrence();
             }
@@ -41,5 +41,9 @@ public class ThreadValidator extends Thread {
 
     public LinkedList<Integer> getBlackListOccurrences(){
         return blackListOccurrences;
+    }
+
+    public int getCheckedListsCount() {
+        return checkedLists;
     }
 }

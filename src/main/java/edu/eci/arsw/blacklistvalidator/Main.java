@@ -5,16 +5,30 @@
  */
 package edu.eci.arsw.blacklistvalidator;
 
-import java.util.List;
-
-/**
- *
- * @author hcadavid
- */
 public class Main {
-    
-    public static void main(String a[]) throws InterruptedException {
+
+    public static void main(String args[]) throws InterruptedException {
+        // Determinamos los núcleos para una de las pruebas del lab
+        int núcleos = Runtime.getRuntime().availableProcessors();
+
         HostBlackListsValidator validator = new HostBlackListsValidator();
-        validator.checkHost("202.24.34.55", 5);
+
+        // 1. Pausa inicial: Dale tiempo a VisualVM para detectar el proceso
+        System.out.println("Esperando 5 segundos para conectar VisualVM");
+        Thread.sleep(5000);
+
+        // 2. Ejecución y toma de tiempo
+        long startTime = System.currentTimeMillis();
+
+        // Prueba
+        validator.checkHost("202.24.34.55", 100);
+
+        long endTime = System.currentTimeMillis();
+
+        // 3. Resultado del experimento
+        System.out.println("Tiempo de ejecución: " + (endTime - startTime) + "ms");
+
+        System.out.println("Prueba terminada. Tienes 10 segundos adicionales para ver las gráficas.");
+        Thread.sleep(10000);
     }
 }
