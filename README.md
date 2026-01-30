@@ -153,7 +153,7 @@ La gráfica derecha (Speedup) compara el rendimiento real contra el ideal lineal
 - *Threads:* 17 live, 117 total started
 - *Live peak:* 117 hilos
 
-![Uploading VM_100_Hilos_Threads.png…]()
+<img width="1363" height="714" alt="VM_100_Hilos_Threads" src="https://github.com/user-attachments/assets/ea93107b-d2ca-40b5-9574-7f14df5c7e02" />
 
 *Observaciones:*
 - La mejora respecto a 50 hilos es solo de 24% (de 12.6s a 9.6s)
