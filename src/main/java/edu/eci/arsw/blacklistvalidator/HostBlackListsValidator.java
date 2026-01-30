@@ -18,6 +18,8 @@ public class HostBlackListsValidator {
 
     private static final int BLACK_LIST_ALARM_COUNT=5;
 
+    public volatile int globalOccurrences = 0;
+
     public int checkedListsCount = 0;
 
     LinkedList<Integer> occurrences = new LinkedList<>();
@@ -41,7 +43,7 @@ public class HostBlackListsValidator {
         int rango = skds.getRegisteredServersCount() / N;
 
         for(int i=0;i<skds.getRegisteredServersCount(); i+=rango) {
-            ThreadValidator thread = new ThreadValidator(i, i + rango - 1, ipaddress);
+            ThreadValidator thread = new ThreadValidator(i, i + rango - 1, ipaddress, this);
             thread.start();
             threads.add(thread);
         }
@@ -65,7 +67,13 @@ public class HostBlackListsValidator {
         return occurrences;
     }
 
+    public synchronized void addOccurrence() {
+        this.globalOccurrences++;
+    }
 
     private static final Logger LOG = Logger.getLogger(HostBlackListsValidator.class.getName());
 
+    public Integer getGlobalOccurrences() {
+        return globalOccurrences;
+    }
 }

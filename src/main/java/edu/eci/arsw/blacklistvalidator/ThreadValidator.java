@@ -13,11 +13,14 @@ public class ThreadValidator extends Thread {
 
     private static final int BLACK_LIST_ALARM_COUNT=5;
 
-    public ThreadValidator (int a, int b, String ipaddress){
+    private HostBlackListsValidator validator;
+
+    public ThreadValidator (int a, int b, String ipaddress, HostBlackListsValidator validator) {
         this.a = a;
         this.b = b;
         this.ipaddress = ipaddress;
         checkedLists=0;
+        this.validator = validator;
     }
 
 
@@ -25,10 +28,11 @@ public class ThreadValidator extends Thread {
     public void run(){
 
         HostBlacklistsDataSourceFacade skds=HostBlacklistsDataSourceFacade.getInstance();
-        for(int i = a; i <= b; i++){
+        for(int i = a; i <= b && validator.getGlobalOccurrences() < BLACK_LIST_ALARM_COUNT; i++){
             checkedLists++;
             if (skds.isInBlackListServer(i, ipaddress)){
                 blackListOccurrences.add(i);
+                validator.addOccurrence();
             }
         }
     }
